@@ -6,6 +6,6 @@ function view($viewname,$variables = []){
 	foreach ($vn as $v) {
 		$va = $va.'/'.$v;
 	}
-	include('../views'.$va.'.php');
+	include(realpath('../').'/views'.$va.'.php');
 
 }

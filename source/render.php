@@ -1,10 +1,10 @@
 <?php
-require 'library/view.php';
+require realpath(dirname(__FILE__)).'/view.php';
 
 $uri = $_SERVER['REQUEST_URI'];
 if($uri == '/'){
 
-	require 'controller/'.$route[$uri]['controller'].'.php';
+	require realpath('../').'/controller/'.$route[$uri]['controller'].'.php';
 	$route[$uri]['function']();
 }
 else{	
@@ -12,7 +12,7 @@ else{
 	$uri = explode('/', $uri);
 	if(array_search($uri[1], array_keys($route)) != ''){
 	$inputs = [];
-	require 'controller/'.$route[$uri[1]]['controller'].'.php';
+	require realpath('../').'/controller/'.$route[$uri[1]]['controller'].'.php';
 	if(isset($route[$uri[1]]['variables']) || $route[$uri[1]]['variables'] != ''){
 
 		$variables = explode('/', $route[$uri[1]]['variables']);
