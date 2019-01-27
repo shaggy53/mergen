@@ -91,7 +91,7 @@ function getroute($name,$vrb = []){
         }
     }
     $protocol = strtolower(explode('/', $_SERVER['SERVER_PROTOCOL'])[0]);
-    return $protocol.'://'.$_SERVER['SERVER_NAME'].$uri;
+    return $protocol.'://'.$_SERVER['SERVER_NAME'].'/'.$uri;
 }
 function part($part){
     include('../views/pages/parts/'.$part.'.php');
