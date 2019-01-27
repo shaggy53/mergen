@@ -16,8 +16,7 @@ $route=[
 'name' => 'finds'
 ],
 'find2' => [
-'type' => 'get',	
-'variables' => 'v1/v2/v3/v4/seyit',	
+'type' => 'post',
 'controller' =>'SiteController',
 'function' => 'findUri2',
 'name' => 'findss'
