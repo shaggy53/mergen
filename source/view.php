@@ -1,4 +1,4 @@
-<?php
+<?php 
 function view($viewname,$variables = []){
 	$vn = explode('.',$viewname);
 	$va = '';
