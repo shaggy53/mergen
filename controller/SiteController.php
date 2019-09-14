@@ -1,11 +1,12 @@
 <?php
-
+model('users');
 
 class SiteController
 {
-
     public function getIndex(){
-        echo 'controllere geldin!(getindex/sitecontroller)';
+        $users = new Users;
+        $search = $users->where('username','=','mergen');
+        print_r($search);
     }
     public function findUri($inputs){
         view('pages.index',$inputs);

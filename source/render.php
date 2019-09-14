@@ -79,6 +79,11 @@ else{
 			http_response_code(404);
 		}
 	}
+function model($modelname){
+    require realpath(dirname(__FILE__)).'/Model.php';
+    require realpath('../').'/Model/'.$modelname.'.php';
+
+}
 
 
 
