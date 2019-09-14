@@ -1,4 +1,4 @@
-<?php 
+<?php
 require realpath(dirname(__FILE__)).'/view.php';
 
 $uri = $_SERVER['REQUEST_URI'];
@@ -17,7 +17,9 @@ if (preg_match('/\b(' . preg_quote('?', '/') . '\w+)/', $uri, $match)) {
 if($uri == '/'){
 
 	require realpath('../').'/controller/'.$route[$uri]['controller'].'.php';
-	$route[$uri]['function']();
+    $run = new  $route[$uri]['controller'];
+    $function = $route[$uri]['function'];
+    $run->{$function}();
 }
 else{	
 	
@@ -30,7 +32,8 @@ else{
                 }
 		    	$inputs = [];
 		    	require realpath('../').'/controller/'.$route[$uri[1]]['controller'].'.php';
-		    	if(isset($route[$uri[1]]['variables']) || $route[$uri[1]]['variables'] != ''){
+
+		    	if(isset($route[$uri[1]]['variables']) || @$route[$uri[1]]['variables'] != ''){
 
 		    		$variables = explode('/', $route[$uri[1]]['variables']);
 		    		$sy = 2;
@@ -48,7 +51,9 @@ else{
 		    	    foreach ($requestdata as $key => $value)
 		    	    $inputs[$key] = $value;
                 }
-                $route[$uri[1]]['function']($inputs);
+		    	$run = new $route[$uri[1]]['controller'];
+		    	$function = $route[$uri[1]]['function'];
+                $run->{$function}($inputs);
 		    }
 		    elseif($route[$uri[1]]['type'] == 'post'){
 		    	$inputs = [];
@@ -63,7 +68,9 @@ else{
                     }else{
                         $inputs = [];
                     }
-                    $route[$uri[1]]['function']($inputs);
+                    $run = new $route[$uri[1]]['controller'];
+                    $function = $route[$uri[1]]['function'];
+                    $run->{$function}($inputs);
 		    	}
 
 		    }

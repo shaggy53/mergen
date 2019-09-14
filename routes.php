@@ -7,7 +7,6 @@ $route=[
 'function' => 'getIndex',
 'name' => 'home'
 ],
-
 'find' => [
 'type' => 'get',
 'variables' => 'v1/v2/v3/v4/seyit',	
