@@ -4,8 +4,15 @@ class Model
 {
     private $connection = null;
     private $statement = null;
+    protected $_where;
+    protected $_join;
+    protected $_groupby;
+    protected $_orderby;
+    protected $_query;
+    protected $_select;
 
     public function __construct($hostname = 'localhost', $username = DB_USERNAME, $password = DB_PASSWORD, $database = DB_NAME, $port = '3306') {
+        $this->_select = '*';
         try {
             $this->connection = new \PDO("mysql:host=" . $hostname . ";port=" . $port . ";dbname=" . $database, $username, $password, array(\PDO::ATTR_PERSISTENT => true));
         } catch(\PDOException $e) {
@@ -18,11 +25,11 @@ class Model
         $this->connection->exec("SET SQL_MODE = ''");
     }
 
-    public function prepare($sql) {
+    protected function prepare($sql) {
         $this->statement = $this->connection->prepare($sql);
     }
 
-    public function bindParam($parameter, $variable, $data_type = \PDO::PARAM_STR, $length = 0) {
+    protected function bindParam($parameter, $variable, $data_type = \PDO::PARAM_STR, $length = 0) {
         if ($length) {
             $this->statement->bindParam($parameter, $variable, $data_type, $length);
         } else {
@@ -30,7 +37,7 @@ class Model
         }
     }
 
-    public function execute() {
+    protected function execute() {
         try {
             if ($this->statement && $this->statement->execute()) {
                 $data = array();
@@ -49,7 +56,7 @@ class Model
         }
     }
 
-    public function query($sql, $params = array()) {
+    protected function queryProtect($sql, $params = array()) {
         $this->statement = $this->connection->prepare($sql);
 
         $result = false;
@@ -82,11 +89,11 @@ class Model
         }
     }
 
-    public function escape($value) {
+    protected function escape($value) {
         return str_replace(array("\\", "\0", "\n", "\r", "\x1a", "'", '"'), array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"'), $value);
     }
 
-    public function countAffected() {
+    protected function countAffected() {
         if ($this->statement) {
             return $this->statement->rowCount();
         } else {
@@ -94,21 +101,92 @@ class Model
         }
     }
 
-    public function getLastId() {
+    protected function getLastId() {
         return $this->connection->lastInsertId();
     }
 
-    public function isConnected() {
+    protected function isConnected() {
         if ($this->connection) {
             return true;
         } else {
             return false;
         }
     }
-    public function where($row,$operator = '=',$search){
-        $query = $this->query("SELECT * FROM `{$this->table}` WHERE `{$row}`{$operator}'{$search}'");
-        return $query;
+    public function where($row,$operator = '=',$search,$type = 'AND'){
+        if(strstr($this->_where,'WHERE')){
+            $this->_where .=" {$this->escape($type)} `{$this->escape($row)}`{$this->escape($operator)}'{$this->escape($search)}'";
+        }else{
+            $this->_where .=" WHERE `{$this->escape($row)}`{$this->escape($operator)}'{$this->escape($search)}'";
+        }
+        return $this;
     }
+    public function join($second_table = '',$first_id = '',$second_id = '',$type='INNER'){
+        if($first_id == ''){
+            $first_id = 'id';
+        }
+        if($second_id == ''){
+            $second_id = $this->table.'_id';
+        }
+        $this->_join = " {$this->escape($type)} JOIN `{$this->escape($second_table)}` ON {$this->table}.{$this->escape($first_id)} = {$this->escape($second_table)}.{$this->escape($second_id)}";
+        return $this;
+    }
+    public function groupBy($column = ''){
+        $this->_groupby = " GROUP BY {$this->escape($column)}";
+        return $this;
+    }
+    public function orderBy($column = '',$type ='DESC'){
+        $this->_orderby = " ORDER BY {$this->escape($column)} {$this->escape($type)}";
+        return $this;
+    }
+    public function select($select){
+        $this->_select = " {$this->escape($select)} ";
+        return $this;
+    }
+    public function query($query = ''){
+        $this->_query = $query;
+        return $this;
+    }
+    protected function mergeWhereQuery(){
+        if($this->_query == ''){
+            $this->_query = "SELECT {$this->_select} FROM `{$this->table}`".$this->_join.$this->_where.$this->_groupby.$this->_orderby;
+        }
+        return $this;
+    }
+    public function get($type = 'array'){
+        $query = $this->queryProtect($this->mergeWhereQuery()->_query);
+        if($type == 'object'){
+            return json_decode(json_encode($query->rows));
+        }else{
+            return $query->rows;
+        }
+    }
+    public function first($type = 'array'){
+        $query = $this->queryProtect($this->_where);
+        if($type == 'object'){
+            return json_decode(json_encode($query->row));
+        }else{
+            return $query->row;
+        }
+    }
+    /*
+    public function where($row,$operator = '=',$search){
+        $this->_where = $this->query("SELECT * FROM `{$this->table}` WHERE `{$row}`{$operator}'{$search}'");
+        return $this;
+    }
+    public function get($type = 'array'){
+        if($type == 'object'){
+            return json_decode(json_encode($this->_where->rows));
+        }else{
+            return $this->_where->rows;
+        }
+    }
+    public function first($type = 'array'){
+        if($type == 'object'){
+            return json_decode(json_encode($this->_where->row));
+        }else{
+            return $this->_where->row;
+        }
+    }*/
 
     public function __destruct() {
         $this->connection = null;

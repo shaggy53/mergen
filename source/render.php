@@ -15,7 +15,7 @@ if (preg_match('/\b(' . preg_quote('?', '/') . '\w+)/', $uri, $match)) {
 }
 
 if($uri == '/'){
-
+    require realpath('../').'/source/Controller.php';
 	require realpath('../').'/controller/'.$route[$uri]['controller'].'.php';
     $run = new  $route[$uri]['controller'];
     $function = $route[$uri]['function'];
@@ -79,11 +79,7 @@ else{
 			http_response_code(404);
 		}
 	}
-function model($modelname){
-    require realpath(dirname(__FILE__)).'/Model.php';
-    require realpath('../').'/Model/'.$modelname.'.php';
 
-}
 
 
 
