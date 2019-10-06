@@ -1,32 +1,5 @@
 <?php
 
-function writeObj($obj, $exit = false){
-	print_r($obj);
-	if($exit)
-		exit;
-}
-
-
-function connectDB(){
-	global $connection;
-	$connection = null;
-	try {
-        $connection = new \PDO(DB_TYPE . ":host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD, array(
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-                PDO::ATTR_PERSISTENT => FALSE,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            )
-        );
-    } catch (\PDOException $e) {
-    	writeObj($e);
-        header($_SERVER['SERVER_PROTOCOL'] . ' 500 İç Sunucu Hatası', true, 500);
-        echo "<h1>Veritabanı Bağlantısında Hata! (MY001)</h1>";
-        exit;
-    }
-}
-
-
 function sessionStart()
 {
     if (session_id() == '') {
@@ -35,19 +8,6 @@ function sessionStart()
         session_start();
     }
 }
-
-
-function clearHtml($var, $remove = false)
-{
-    if (is_array($var)) {
-        return array_map(function ($v) use ($remove) {
-            return clearHtml($v, $remove);
-        }, $var);
-    }
-
-    return trim(!is_string($var) ? $var : ($remove ? strip_tags($var) : htmlspecialchars($var)));
-}
-
 function getSlug($string, $replace = [], $delimiter = '-')
 {
     $string = str_replace('ı', 'i', $string);
@@ -93,6 +53,4 @@ function getroute($name,$vrb = []){
     $protocol = strtolower(explode('/', $_SERVER['SERVER_PROTOCOL'])[0]);
     return $protocol.'://'.$_SERVER['SERVER_NAME'].'/'.$uri;
 }
-function part($part){
-    include('../views/pages/parts/'.$part.'.php');
-}
+

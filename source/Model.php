@@ -1,7 +1,8 @@
 <?php
-
+namespace source;
 class Model
 {
+
     private $connection = null;
     private $statement = null;
     protected $_where;
@@ -10,8 +11,10 @@ class Model
     protected $_orderby;
     protected $_query;
     protected $_select;
+    protected $_limit;
 
     public function __construct($hostname = 'localhost', $username = DB_USERNAME, $password = DB_PASSWORD, $database = DB_NAME, $port = '3306') {
+
         $this->_select = '*';
         try {
             $this->connection = new \PDO("mysql:host=" . $hostname . ";port=" . $port . ";dbname=" . $database, $username, $password, array(\PDO::ATTR_PERSISTENT => true));
@@ -138,6 +141,10 @@ class Model
         $this->_orderby = " ORDER BY {$this->escape($column)} {$this->escape($type)}";
         return $this;
     }
+    public function limit($limit){
+        $this->_limit = " LIMIT {$this->escape($limit)}";
+        return $this;
+    }
     public function select($select){
         $this->_select = " {$this->escape($select)} ";
         return $this;
@@ -148,7 +155,7 @@ class Model
     }
     protected function mergeWhereQuery(){
         if($this->_query == ''){
-            $this->_query = "SELECT {$this->_select} FROM `{$this->table}`".$this->_join.$this->_where.$this->_groupby.$this->_orderby;
+            $this->_query = "SELECT {$this->_select} FROM `{$this->table}`".$this->_join.$this->_where.$this->_groupby.$this->_orderby.$this->_limit;
         }
         return $this;
     }
@@ -161,33 +168,13 @@ class Model
         }
     }
     public function first($type = 'array'){
-        $query = $this->queryProtect($this->_where);
+        $query = $this->queryProtect($this->mergeWhereQuery()->_query);
         if($type == 'object'){
             return json_decode(json_encode($query->row));
         }else{
             return $query->row;
         }
     }
-    /*
-    public function where($row,$operator = '=',$search){
-        $this->_where = $this->query("SELECT * FROM `{$this->table}` WHERE `{$row}`{$operator}'{$search}'");
-        return $this;
-    }
-    public function get($type = 'array'){
-        if($type == 'object'){
-            return json_decode(json_encode($this->_where->rows));
-        }else{
-            return $this->_where->rows;
-        }
-    }
-    public function first($type = 'array'){
-        if($type == 'object'){
-            return json_decode(json_encode($this->_where->row));
-        }else{
-            return $this->_where->row;
-        }
-    }*/
-
     public function __destruct() {
         $this->connection = null;
     }
