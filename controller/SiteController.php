@@ -10,8 +10,8 @@ class SiteController extends Controller
         //$insert = $users->insert(['username'=>'Test','password'=>'Insert']);
         //$search = $users->update(['password'=>'passwords']);
         //$search = $users->query("SELECT * FROM `users` INNER JOIN `users_jion` ON users.id = users_jion.users_id WHERE `username`='mergen2' AND `password`='mergenn' GROUP BY users.password ORDER BY users.id DESC")->get();
-        $users->where('username','=','mergen3')->update(['username'=>'mergen1']);
-        $search = $users->random(2);
+        //$users->where('username','=','mergen1')->delete();
+        $search = $users->get();
         view('pages.index',['search' => $search]);
     }
 

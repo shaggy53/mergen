@@ -165,6 +165,12 @@ class Model
         }
         return $this;
     }
+    protected function mergeDeleteQuery(){
+        if($this->_query == ''){
+            $this->_query = "DELETE FROM `{$this->table}` ".$this->_join.$this->_where.$this->_groupby.$this->_orderby.$this->_limit;
+        }
+        return $this;
+    }
     public function get($type = 'array'){
 
         $query = $this->queryProtect($this->mergeWhereQuery()->_query);
@@ -224,6 +230,16 @@ class Model
         }
         $update = substr($update,0,-1);
         $query = $this->queryProtect($this->mergeUpdateQuery($update)->_query);
+        if($query){
+            $this->resetClass();
+            return true;
+        }else{
+            $this->resetClass();
+            return false;
+        }
+    }
+    public function delete(){
+        $query = $this->queryProtect($this->mergeDeleteQuery()->_query);
         if($query){
             $this->resetClass();
             return true;
