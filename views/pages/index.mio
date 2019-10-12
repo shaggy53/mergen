@@ -1,0 +1,13 @@
+<?php
+part('pages.parts.header');
+?>
+<br>
+<pre>
+<?php
+print_r($search);
+?>
+</pre>
+<br>
+<?php
+part('pages.parts.footer');
+?>

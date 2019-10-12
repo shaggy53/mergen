@@ -1,14 +1,20 @@
 <?php
 function part($part){
- return include('../views/pages/parts/'.$part.'.php');
+    $part = explode('.',$part);
+    $incl = '/';
+    foreach ($part as $p){
+        $incl .= $p.'/';
+    }
+    $incl = substr($incl,0,-1);
+ return include(realpath('../').'/views'.$incl.'.mio');
 }
 function view($viewname,$variables = []){
 	$vn = explode('.',$viewname);
 	$va = '';
 	extract($variables);
 	foreach ($vn as $v) {
-		$va = $va.'/'.$v;
+		$va .= '/'.$v;
 	}
-	include(realpath('../').'/views'.$va.'.php');
+	include(realpath('../').'/views'.$va.'.mio');
 
 }

@@ -104,7 +104,7 @@ class Model
         }
     }
 
-    protected function getLastId() {
+    public function getLastId() {
         return $this->connection->lastInsertId();
     }
 
@@ -159,23 +159,90 @@ class Model
         }
         return $this;
     }
+    protected function mergeUpdateQuery($statements = ''){
+        if($this->_query == ''){
+            $this->_query = "UPDATE `{$this->table}` SET {$statements} ".$this->_join.$this->_where.$this->_groupby.$this->_orderby.$this->_limit;
+        }
+        return $this;
+    }
     public function get($type = 'array'){
+
         $query = $this->queryProtect($this->mergeWhereQuery()->_query);
         if($type == 'object'){
+            $this->resetClass();
             return json_decode(json_encode($query->rows));
         }else{
+            $this->resetClass();
             return $query->rows;
         }
     }
     public function first($type = 'array'){
         $query = $this->queryProtect($this->mergeWhereQuery()->_query);
         if($type == 'object'){
+            $this->resetClass();
             return json_decode(json_encode($query->row));
         }else{
+            $this->resetClass();
             return $query->row;
         }
     }
+    public function count($row = '*'){
+        $this->select('COUNT('.$row.') as count');
+        $query = $this->queryProtect($this->mergeWhereQuery()->_query);
+        $this->resetClass();
+        return $query->row['count'];
+    }
+    public function random($count = 0){
+        $this->orderBy('','RAND()');
+        $this->limit($this->escape('0,'.$count));
+        if($count == 1){
+            return $this->first();
+        }else{
+            return $this->get();
+        }
+    }
+    public function insert($rows = []){
+        $insert = '';
+        foreach ($rows as $row => $value){
+            $insert .= '`'.$this->escape($row).'`=\''.$this->escape($value).'\',';
+        }
+        $insert = substr($insert,0,-1);
+        $query = $this->queryProtect("INSERT INTO {$this->table} SET {$insert}");
+
+        if($query){
+            $this->resetClass();
+            return $this->getLastId();
+        }else{
+            $this->resetClass();
+            return false;
+        }
+    }
+    public function update($rows = []){
+        $update = '';
+        foreach ($rows as $row => $value){
+            $update .= '`'.$this->escape($row).'`=\''.$this->escape($value).'\',';
+        }
+        $update = substr($update,0,-1);
+        $query = $this->queryProtect($this->mergeUpdateQuery($update)->_query);
+        if($query){
+            $this->resetClass();
+            return true;
+        }else{
+            $this->resetClass();
+            return false;
+        }
+    }
+    protected function resetClass(){
+        $this->_where = null;
+        $this->_join = null;
+        $this->_groupby = null;
+        $this->_orderby = null;
+        $this->_query = null;
+        $this->_select = '*';
+        $this->_limit = null;
+    }
     public function __destruct() {
         $this->connection = null;
+
     }
 }
