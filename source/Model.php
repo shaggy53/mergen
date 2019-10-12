@@ -198,6 +198,24 @@ class Model
         $this->resetClass();
         return $query->row['count'];
     }
+    public function sum($row = ''){
+        if($row == ''){
+            return false;
+        }
+        $this->select('SUM('.$row.') as sum');
+        $query = $this->queryProtect($this->mergeWhereQuery()->_query);
+        $this->resetClass();
+        return $query->row['sum'];
+    }
+    public function avg($row = ''){
+        if($row == ''){
+            return false;
+        }
+        $this->select('AVG('.$row.') as avg');
+        $query = $this->queryProtect($this->mergeWhereQuery()->_query);
+        $this->resetClass();
+        return $query->row['avg'];
+    }
     public function random($count = 0){
         $this->orderBy('','RAND()');
         $this->limit($this->escape('0,'.$count));

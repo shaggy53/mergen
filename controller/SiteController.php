@@ -11,7 +11,7 @@ class SiteController extends Controller
         //$search = $users->update(['password'=>'passwords']);
         //$search = $users->query("SELECT * FROM `users` INNER JOIN `users_jion` ON users.id = users_jion.users_id WHERE `username`='mergen2' AND `password`='mergenn' GROUP BY users.password ORDER BY users.id DESC")->get();
         //$users->where('username','=','mergen1')->delete();
-        $search = $users->get();
+        $search = $users->sum('id');
         view('pages.index',['search' => $search]);
     }
 
